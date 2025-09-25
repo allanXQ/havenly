@@ -1,5 +1,6 @@
 from django.db import models
 from users.models import BaseUser
+import uuid
 
 # Create your models here.
 class Organizations(models.Model):
