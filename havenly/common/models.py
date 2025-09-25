@@ -1,7 +1,9 @@
 from django.db import models
+import uuid
 
 # Create your models here.
 class Contact(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     organization = models.ForeignKey('organizations.Organization', null=True, blank=True, on_delete=models.CASCADE)
     user = models.ForeignKey('users.User', null=True, blank=True, on_delete=models.CASCADE)
     
@@ -16,6 +18,7 @@ class Contact(models.Model):
         ]
 
 class ContactPhone(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     contact = models.ForeignKey(Contact, related_name='phones', on_delete=models.CASCADE)
     number = models.CharField(max_length=20)
     is_primary = models.BooleanField(default=False)
@@ -23,6 +26,7 @@ class ContactPhone(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 class ContactEmail(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     contact = models.ForeignKey(Contact, related_name='emails', on_delete=models.CASCADE)
     email = models.EmailField()
     is_primary = models.BooleanField(default=False)
@@ -30,6 +34,7 @@ class ContactEmail(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 class Address(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     contact = models.ForeignKey(Contact, related_name='addresses', on_delete=models.CASCADE)
     line1 = models.CharField(max_length=255)
     line2 = models.CharField(max_length=255, blank=True, null=True)
