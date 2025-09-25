@@ -18,7 +18,7 @@ class Organizations(models.Model):
 class OrganizationRoles(models.Model):
     organization = models.ForeignKey(Organizations, on_delete=models.CASCADE)
     user = models.ForeignKey(BaseUser, on_delete=models.CASCADE)
-    role_name = models.TextChoices('role_name', 'AGENT CLIENT')
+    role_name = models.TextChoices('role_name', 'ADMIN AGENT RENTER BUYER')
     permissions = models.JSONField(default=dict)  # Store permissions as a JSON object
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
