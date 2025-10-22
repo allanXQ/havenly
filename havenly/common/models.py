@@ -11,6 +11,14 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
+class BaseKYCModel(BaseModel):
+    document_type = models.CharField(max_length=50)
+    document_number = models.CharField(max_length=100)
+    document_image = models.ImageField(upload_to='kyc_docs/') # to be migrated to a cloud storage later
+    status = models.TextChoices('status', 'PENDING VERIFIED REJECTED')
+    class Meta:
+        abstract = True
+
 # Im using this approach because contacts can belong to either organizations or users.
 # Each contact can have multiple phone numbers, emails, and addresses associated with it.
 class Contact(BaseModel):
