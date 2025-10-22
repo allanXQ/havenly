@@ -11,6 +11,7 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
+# Separate kyc models to allow for independent extension in future
 class BaseKYCModel(BaseModel):
     document_type = models.CharField(max_length=50)
     document_number = models.CharField(max_length=100)
