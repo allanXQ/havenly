@@ -13,10 +13,12 @@ class BaseModel(models.Model):
 
 # Separate kyc models to allow for independent extension in future
 class BaseKYCModel(BaseModel):
+    Status = models.TextChoices('status', 'PENDING VERIFIED REJECTED')
     document_type = models.CharField(max_length=50)
     document_number = models.CharField(max_length=100)
     document_image = models.ImageField(upload_to='kyc_docs/') # to be migrated to a cloud storage later
-    status = models.TextChoices('status', 'PENDING VERIFIED REJECTED')
+    status = models.CharField(max_length=9, choices=Status.choices, default=Status.PENDING)
+    rejection_reason = models.CharField(max_length=200, null=True, blank=True)
     class Meta:
         abstract = True
 
