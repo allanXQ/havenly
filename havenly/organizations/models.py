@@ -1,14 +1,14 @@
 from django.db import models
-from users.models import BaseUser
-from havenly.common.models import BaseModel, BaseKYCModel
+from users.models import BaseUserModel
+from common.models import BaseModel, BaseKYCModel
 
 # Create your models here.
 class Organizations(BaseModel):
     OrganizationType = models.TextChoices('organization_type', 'AGENCY INDEPENDENT_AGENT')
     name = models.CharField(max_length=255, blank=False, null=False)
-    organization_type = models.CharField(max_length=20, choices=OrganizationType.choices)
+    organization_type = models.CharField(max_length=20, choices=OrganizationType.choices, blank=False, null=False)
     currency = models.CharField(max_length=3, default='USD')
-    country = models.CharField(max_length=15, blank=True, null=True)
+    country = models.CharField(max_length=15, blank=False, null=False)
 
     def __str__(self):
         return self.name
@@ -17,7 +17,7 @@ class Organizations(BaseModel):
 class OrganizationRoles(BaseModel):
     RoleName = models.TextChoices('role_name', 'ADMIN AGENT RENTER BUYER')
     organization = models.ForeignKey(Organizations, on_delete=models.CASCADE)
-    user = models.ForeignKey(BaseUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(BaseUserModel, on_delete=models.CASCADE)
     role_name = models.CharField(max_length=6, choices=RoleName.choices)
     permissions = models.JSONField(default=dict)  # Store permissions as a JSON object
 
