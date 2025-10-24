@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'django_filters',
+    'debug_toolbar', # RESEARCH HOW TO USE TO DB OPTIMIZE QUERIES ETC
 
     # local apps
     'common',

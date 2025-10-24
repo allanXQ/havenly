@@ -52,8 +52,6 @@ class Role(models.Model):
     permissions = models.ManyToManyField(Permission, related_name='role_permissions')
     is_system_role = models.BooleanField(default=False)  # System roles can't be deleted
     description = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
         db_table = 'roles'
