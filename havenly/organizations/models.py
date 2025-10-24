@@ -12,20 +12,92 @@ class Organizations(BaseModel):
 
     def __str__(self):
         return self.name
-
-# Define roles and permissions within an organization. To allow different roles per user in different organizations.
-class OrganizationRoles(BaseModel):
-    RoleName = models.TextChoices('role_name', 'ADMIN AGENT RENTER BUYER')
-    organization = models.ForeignKey(Organizations, on_delete=models.CASCADE)
-    user = models.ForeignKey(BaseUserModel, on_delete=models.CASCADE)
-    role_name = models.CharField(max_length=6, choices=RoleName.choices)
-    permissions = models.JSONField(default=dict)  # Store permissions as a JSON object
-
-    def __str__(self):
-        return f"{self.role_name} - {self.organization.name}"
     
 class OrganizationKYC(BaseKYCModel):
     organization = models.OneToOneField(Organizations, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"KYC for {self.organization.name} - Verified: {self.verified}"
+
+class Permission(models.Model):
+    """
+    Granular permission definitions
+    Examples: 'view_listing', 'create_listing', 'approve_kyc', 'view_reports'
+    """
+    codename = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    module = models.CharField(max_length=50)  # e.g., 'listing', 'property', 'user', 'financial'
+    
+    class Meta:
+        db_table = 'permissions'
+        ordering = ['module', 'name']
+    
+    def __str__(self):
+        return f"{self.module}.{self.codename}"
+
+
+class Role(models.Model):
+    """
+    Roles that can be assigned within organizations
+    Can be system-defined or organization-specific custom roles
+    """
+    name = models.CharField(max_length=100)
+    organization = models.ForeignKey(
+        'organizations.Organization', 
+        on_delete=models.CASCADE,
+        null=True, 
+        blank=True  # Null = system-wide role, not null = org-specific role
+    )
+    permissions = models.ManyToManyField(Permission, related_name='roles')
+    is_system_role = models.BooleanField(default=False)  # System roles can't be deleted
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'roles'
+        unique_together = ['name', 'organization']
+        indexes = [
+            models.Index(fields=['organization', 'is_system_role']),
+        ]
+    
+    def __str__(self):
+        return f"{self.name} ({self.organization or 'System'})"
+
+
+class OrganizationMembership(models.Model):
+    """
+    Links users to organizations with their roles
+    A user can have multiple roles in the same/different organization
+    """
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+        ('pending', 'Pending'),
+        ('suspended', 'Suspended'),
+    ]
+    
+    organization = models.ForeignKey(
+        'organizations.Organization', 
+        on_delete=models.CASCADE,
+        related_name='memberships'
+    )
+    user = models.ForeignKey(
+        'users.User', 
+        on_delete=models.CASCADE,
+        related_name='organization_memberships'
+    )
+    roles = models.ManyToManyField(Role, related_name='memberships')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+    reason_for_status_change = models.TextField(blank=True)
+    class Meta:
+        db_table = 'organization_memberships'
+        unique_together = ['organization', 'user']
+        indexes = [
+            models.Index(fields=['organization', 'status']),
+            models.Index(fields=['user', 'status']),
+        ]
+    
+    def __str__(self):
+        return f"{self.user.email} in {self.organization.name}"
