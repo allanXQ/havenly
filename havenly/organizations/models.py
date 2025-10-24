@@ -49,7 +49,7 @@ class Role(models.Model):
         null=True, 
         blank=True  # Null = system-wide role, not null = org-specific role
     )
-    permissions = models.ManyToManyField(Permission, related_name='roles')
+    permissions = models.ManyToManyField(Permission, related_name='role_permissions')
     is_system_role = models.BooleanField(default=False)  # System roles can't be deleted
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -57,10 +57,6 @@ class Role(models.Model):
     
     class Meta:
         db_table = 'roles'
-        unique_together = ['name', 'organization']
-        indexes = [
-            models.Index(fields=['organization', 'is_system_role']),
-        ]
     
     def __str__(self):
         return f"{self.name} ({self.organization or 'System'})"
@@ -81,23 +77,18 @@ class OrganizationMembership(models.Model):
     organization = models.ForeignKey(
         'organizations.Organization', 
         on_delete=models.CASCADE,
-        related_name='memberships'
+        related_name='membership_organization'
     )
     user = models.ForeignKey(
         'users.User', 
         on_delete=models.CASCADE,
-        related_name='organization_memberships'
+        related_name='membership_user'
     )
-    roles = models.ManyToManyField(Role, related_name='memberships')
+    roles = models.ManyToManyField(Role, related_name='membership_roles')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     reason_for_status_change = models.TextField(blank=True)
     class Meta:
         db_table = 'organization_memberships'
-        unique_together = ['organization', 'user']
-        indexes = [
-            models.Index(fields=['organization', 'status']),
-            models.Index(fields=['user', 'status']),
-        ]
     
     def __str__(self):
         return f"{self.user.email} in {self.organization.name}"
