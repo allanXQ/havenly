@@ -1,5 +1,4 @@
 from django.db import models
-from users.models import BaseUserModel
 from common.models import BaseModel, BaseKYCModel
 
 # Create your models here.
@@ -37,14 +36,14 @@ class Permission(models.Model):
         return f"{self.module}.{self.codename}"
 
 
-class Role(models.Model):
+class OrganizationRoles(models.Model):
     """
     Roles that can be assigned within organizations
     Can be system-defined or organization-specific custom roles
     """
     name = models.CharField(max_length=100)
     organization = models.ForeignKey(
-        'organizations.Organization', 
+        Organizations, 
         on_delete=models.CASCADE,
         null=True, 
         blank=True  # Null = system-wide role, not null = org-specific role
@@ -73,16 +72,16 @@ class OrganizationMembership(models.Model):
     ]
     
     organization = models.ForeignKey(
-        'organizations.Organization', 
+        Organizations, 
         on_delete=models.CASCADE,
         related_name='membership_organization'
     )
     user = models.ForeignKey(
-        'users.User', 
+        'users.BaseUser', 
         on_delete=models.CASCADE,
         related_name='membership_user'
     )
-    roles = models.ManyToManyField(Role, related_name='membership_roles')
+    roles = models.ManyToManyField(OrganizationRoles, related_name='membership_roles')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     reason_for_status_change = models.TextField(blank=True)
     class Meta:

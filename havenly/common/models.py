@@ -22,11 +22,11 @@ class BaseKYCModel(BaseModel):
     class Meta:
         abstract = True
 
-# Im using this approach because contacts can belong to either organizations or users.
+# contacts can belong to either organizations or users.
 # Each contact can have multiple phone numbers, emails, and addresses associated with it.
 class Contact(BaseModel):
     organization = models.ForeignKey('organizations.Organizations', null=True, blank=True, on_delete=models.CASCADE)
-    user = models.ForeignKey('users.BaseUserModel', null=True, blank=True, on_delete=models.CASCADE)
+    user = models.ForeignKey('users.BaseUser', null=True, blank=True, on_delete=models.CASCADE)
 
     class Meta:
         constraints = [

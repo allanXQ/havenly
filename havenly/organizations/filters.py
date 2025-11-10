@@ -11,7 +11,7 @@ class OrganizationFilter(django_filters.FilterSet):
         fields = ['name', 'organization_type', 'country']
 
 class OrganizationRolesFilter(django_filters.FilterSet):
-    role_name = django_filters.ChoiceFilter(choices=OrganizationRoles.RoleName.choices)
+    role_name = django_filters.ChoiceFilter(choices=OrganizationRoles.name)
 
     class Meta:
         model = OrganizationRoles
