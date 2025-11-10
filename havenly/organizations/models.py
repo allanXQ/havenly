@@ -18,7 +18,7 @@ class OrganizationKYC(BaseKYCModel):
     def __str__(self):
         return f"KYC for {self.organization.name} - Verified: {self.verified}"
 
-class Permission(models.Model):
+class Permission(BaseModel):
     """
     Granular permission definitions
     Examples: 'view_listing', 'create_listing', 'approve_kyc', 'view_reports'
@@ -36,7 +36,7 @@ class Permission(models.Model):
         return f"{self.module}.{self.codename}"
 
 
-class OrganizationRoles(models.Model):
+class OrganizationRoles(BaseModel):
     """
     Roles that can be assigned within organizations
     Can be system-defined or organization-specific custom roles
@@ -59,7 +59,7 @@ class OrganizationRoles(models.Model):
         return f"{self.name} ({self.organization or 'System'})"
 
 
-class OrganizationMembership(models.Model):
+class OrganizationMembership(BaseModel):
     """
     Links users to organizations with their roles
     A user can have multiple roles in the same/different organization
