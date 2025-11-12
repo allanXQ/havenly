@@ -7,7 +7,13 @@ class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
-
+    created_by = models.ForeignKey(
+        'users.BaseUser',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='%(class)s_created'
+    )
     class Meta:
         abstract = True
 
